@@ -7,6 +7,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}
+  IMAGE_TAG: ${{ github.sha }}
   KUBE_NAMESPACE: devops
 
 jobs:
@@ -25,26 +26,28 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     # ---------------- BACKEND ----------------
-    - name: Build backend image
-      run: |
-        docker build \
-          -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:latest \
-          ./backend-api-dotnet
+- name: Build backend image
+  run: |
+     docker build \
+     -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${{ env.IMAGE_TAG }} \
+     ./backend-api-dotnet
 
-    - name: Push backend image
-      run: |
-        docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:latest
+	- name: Push backend image
+	  run: |
+		docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${{ env.IMAGE_TAG }}
+
 
     # ---------------- FRONTEND ----------------
-    - name: Build frontend image
-      run: |
-        docker build \
-          -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:latest \
-          ./frontend-angular
+	- name: Build frontend image
+	  run: |
+		docker build \
+		  -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${{ env.IMAGE_TAG }} \
+		  ./frontend-angular
 
-    - name: Push frontend image
-      run: |
-        docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:latest
+	- name: Push frontend image
+	  run: |
+		docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${{ env.IMAGE_TAG }}
+
 
     # ---------------- DEPLOY ----------------
     - name: Setup kubectl
@@ -54,13 +57,17 @@ jobs:
       uses: azure/setup-helm@v4
 
     - name: Deploy backend with Helm
-      run: |
-        helm upgrade --install backend helm/backend \
-          --namespace ${{ env.KUBE_NAMESPACE }} \
-          --set image.repository=ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api
+	  run: |
+		helm upgrade --install backend helm/backend \
+		  --namespace ${{ env.KUBE_NAMESPACE }} \
+		  --set image.repository=ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api \
+		  --set image.tag=${{ env.IMAGE_TAG }}
 
-    - name: Deploy frontend with Helm
-      run: |
-        helm upgrade --install frontend helm/frontend \
-          --namespace ${{ env.KUBE_NAMESPACE }} \
-          --set image.repository=ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular
+
+	- name: Deploy frontend with Helm
+	  run: |
+		helm upgrade --install frontend helm/frontend \
+		  --namespace ${{ env.KUBE_NAMESPACE }} \
+		  --set image.repository=ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular \
+		  --set image.tag=${{ env.IMAGE_TAG }}
+

@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: IfNotPresent
+
+service:
+  port: 80
+
+env:
+  API_URL: http://backend-backend:8080
+
+ingress:
+  enabled: true
+  host: devops.local

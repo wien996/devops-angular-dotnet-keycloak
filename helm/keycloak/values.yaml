@@ -1,0 +1,10 @@
+image:
+  repository: quay.io/keycloak/keycloak
+  tag: "25.0"
+
+service:
+  port: 8080
+
+env:
+  KEYCLOAK_ADMIN: admin
+  KEYCLOAK_ADMIN_PASSWORD: admin

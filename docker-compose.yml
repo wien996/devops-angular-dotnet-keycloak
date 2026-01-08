@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  backend-api:
+    build: ./backend-api-dotnet
+    container_name: backend-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak
+
+  frontend-angular:
+    build: ./frontend-angular
+    container_name: frontend-angular
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend-api
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8081:8080"
+
