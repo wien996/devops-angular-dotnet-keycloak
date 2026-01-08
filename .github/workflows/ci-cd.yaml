@@ -27,6 +27,7 @@ jobs:
       # ---------------- BACKEND ----------------
       - name: Build backend image
         run: |
+          IMAGE_TAG=${GITHUB_SHA}
           docker build \
             -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${{ env.IMAGE_TAG }} \
             ./backend-api-dotnet
@@ -38,6 +39,7 @@ jobs:
       # ---------------- FRONTEND ----------------
       - name: Build frontend image
         run: |
+          IMAGE_TAG=${GITHUB_SHA} 
           docker build \
             -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${{ env.IMAGE_TAG }} \
             ./frontend-angular
