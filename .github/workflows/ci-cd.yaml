@@ -21,7 +21,7 @@ jobs:
       # ---------------- ENVIRONMENT ----------------
       - name: Set environment variables
         run: |
-          if [[ "${GITHUB_REF}" == "refs/heads/master" ]]; then
+          if [[ "${GITHUB_REF}" == "master" ]]; then
             echo "ENV=prod" >> $GITHUB_ENV
           else
             echo "ENV=dev" >> $GITHUB_ENV
