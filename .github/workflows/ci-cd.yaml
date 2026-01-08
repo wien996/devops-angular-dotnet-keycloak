@@ -1,21 +1,31 @@
-name: CI/CD Kubernetes
+name: CI - Build & Push Docker Images
 
 on:
   push:
-    branches: ["master"]
+    branches:
+      - master
+      - develop
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}
-  KUBE_NAMESPACE: devops
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # ---------------- ENVIRONMENT ----------------
+      - name: Set environment variables
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/master" ]]; then
+            echo "ENV=prod" >> $GITHUB_ENV
+          else
+            echo "ENV=dev" >> $GITHUB_ENV
+          fi
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -27,27 +37,29 @@ jobs:
       # ---------------- BACKEND ----------------
       - name: Build backend image
         run: |
-         IMAGE_TAG="${GITHUB_SHA}"
-         docker build \
-          -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${IMAGE_TAG} \
-          ./backend-api-dotnet
+          IMAGE_TAG="${GITHUB_SHA}"
+          docker build \
+            -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${IMAGE_TAG} \
+            -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${ENV} \
+            ./backend-api-dotnet
 
       - name: Push backend image
         run: |
-         IMAGE_TAG="${GITHUB_SHA}"
-         docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${IMAGE_TAG}
-
+          IMAGE_TAG="${GITHUB_SHA}"
+          docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${IMAGE_TAG}
+          docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${ENV}
 
       # ---------------- FRONTEND ----------------
       - name: Build frontend image
         run: |
-         IMAGE_TAG="${GITHUB_SHA}"
-         docker build \
-         -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${IMAGE_TAG} \
-         ./frontend-angular
+          IMAGE_TAG="${GITHUB_SHA}"
+          docker build \
+            -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${IMAGE_TAG} \
+            -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${ENV} \
+            ./frontend-angular
 
       - name: Push frontend image
         run: |
-         IMAGE_TAG="${GITHUB_SHA}"
-         docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${IMAGE_TAG}
-
+          IMAGE_TAG="${GITHUB_SHA}"
+          docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${IMAGE_TAG}
+          docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${ENV}
