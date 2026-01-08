@@ -2,7 +2,7 @@ name: CI/CD Kubernetes
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 env:
   REGISTRY: ghcr.io
