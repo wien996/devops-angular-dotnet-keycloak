@@ -27,25 +27,27 @@ jobs:
       # ---------------- BACKEND ----------------
       - name: Build backend image
         run: |
-          IMAGE_TAG=${GITHUB_SHA}
-          docker build \
-            -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${{ env.IMAGE_TAG }} \
-            ./backend-api-dotnet
+         IMAGE_TAG="${GITHUB_SHA}"
+         docker build \
+          -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${IMAGE_TAG} \
+          ./backend-api-dotnet
 
       - name: Push backend image
         run: |
-          IMAGE_TAG="${GITHUB_SHA}"
-          docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${{ env.IMAGE_TAG }}
+         IMAGE_TAG="${GITHUB_SHA}"
+         docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api:${IMAGE_TAG}
+
 
       # ---------------- FRONTEND ----------------
       - name: Build frontend image
         run: |
-          IMAGE_TAG=${GITHUB_SHA} 
-          docker build \
-            -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${{ env.IMAGE_TAG }} \
-            ./frontend-angular
+         IMAGE_TAG="${GITHUB_SHA}"
+         docker build \
+         -t ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${IMAGE_TAG} \
+         ./frontend-angular
 
       - name: Push frontend image
         run: |
-          IMAGE_TAG="${GITHUB_SHA}"
-          docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${{ env.IMAGE_TAG }}
+         IMAGE_TAG="${GITHUB_SHA}"
+         docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${IMAGE_TAG}
+
