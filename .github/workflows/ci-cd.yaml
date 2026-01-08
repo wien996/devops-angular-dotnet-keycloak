@@ -7,7 +7,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}
-  IMAGE_TAG: ${{ github.sha }}
   KUBE_NAMESPACE: devops
 
 jobs:
@@ -46,33 +45,3 @@ jobs:
       - name: Push frontend image
         run: |
           docker push ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular:${{ env.IMAGE_TAG }}
-
-      # ---------------- DEPLOY ----------------
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v4
-
-      - name: Setup Helm
-        uses: azure/setup-helm@v4
-
-      - name: Configure kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG_DATA }}" > $HOME/.kube/config
-
-      - name: Ensure namespace exists
-        run: |
-          kubectl get namespace ${{ env.KUBE_NAMESPACE }} || kubectl create namespace ${{ env.KUBE_NAMESPACE }}
-
-      - name: Deploy backend with Helm
-        run: |
-          helm upgrade --install backend helm/backend \
-            --namespace ${{ env.KUBE_NAMESPACE }} \
-            --set image.repository=ghcr.io/${{ env.IMAGE_NAMESPACE }}/backend-api \
-            --set image.tag=${{ env.IMAGE_TAG }}
-
-      - name: Deploy frontend with Helm
-        run: |
-          helm upgrade --install frontend helm/frontend \
-            --namespace ${{ env.KUBE_NAMESPACE }} \
-            --set image.repository=ghcr.io/${{ env.IMAGE_NAMESPACE }}/frontend-angular \
-            --set image.tag=${{ env.IMAGE_TAG }}
